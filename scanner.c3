@@ -115,7 +115,7 @@ fn char Scanner.advance(&self) {
 }
 
 fn char Scanner.peek(&self) {
-	if (self.is_end()) return 0; // not needed in odin or clox, why?
+	if (self.is_end()) return 0; // needed because readline has no \n
 	return self.src[self.current];
 }
 
