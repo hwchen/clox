@@ -26,13 +26,9 @@ fn int main(String[] args) {
 fn void! repl() {
 	Vm vm;
 
-	ReadBuffer rdr;
-	char[4096] buf;
-	rdr.init(io::stdin(), &buf);
-
 	while (true) {
 		io::print("> ");
-		String line = io::readline(&rdr, allocator::temp())!;
+		String line = io::readline(io::stdin(), allocator::temp())!;
 		Chunk chunk = compiler::compile(line);
 		vm.interpret(chunk)!;
 	}
