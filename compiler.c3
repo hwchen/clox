@@ -19,7 +19,12 @@ fn Chunk compile(char[] src) {
 		} else {
 			io::print("   |");
 		}
-		io::printfn("%s '%s'", token.type, (String)scanner::token_lexeme(token, src));
+		io::printf("%s '%s'", token.type, (String)scanner::token_lexeme(token, src));
+		if (token.type == ERROR) {
+			io::printfn(" Error: %s", scnr.err_msg);
+		} else {
+			io::printn();
+		}
 
 		if (token.type == EOF) break;
 	}
