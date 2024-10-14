@@ -115,6 +115,7 @@ fn char Scanner.advance(&self) {
 }
 
 fn char Scanner.peek(&self) {
+	if (self.is_end()) return 0; // not needed in odin or clox, why?
 	return self.src[self.current];
 }
 
