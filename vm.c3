@@ -25,7 +25,7 @@ fn void! Vm.interpret(&vm, Chunk chunk) {
 				io::printf("[ %v ]", v);
 			}
 			io::printn();
-			instruction_disassemble(chunk, vm.ip);
+			instruction_disassemble(&chunk, vm.ip);
 		$endif
 
 		OpCode opcode = (OpCode)chunk.code[vm.ip];
