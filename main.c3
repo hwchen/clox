@@ -31,7 +31,7 @@ fn void repl() {
 				if (error == IoError.EOF) return;
 				io::eprintfn("Readline error: %s", error);
 			}
-			Chunk* chunk = mem::new(Chunk);
+			Chunk* chunk = mem::temp_new(Chunk);
 			if (catch error = compiler::compile(line, chunk)) {
 				io::eprintfn("Compiler error: %s", error);
 			}
