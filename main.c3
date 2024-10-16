@@ -1,6 +1,7 @@
 module clox;
 
 import std::io;
+import std::core::mem;
 
 import compiler;
 import vm;
@@ -28,8 +29,11 @@ fn void! repl() {
 
 	while (true) {
 		io::print("> ");
-		String line = io::readline(io::stdin(), allocator::temp())!;
-		Chunk chunk = compiler::compile(line);
-		vm.interpret(chunk)!;
+		@pool() {
+			String line = io::readline(io::stdin())!;
+			Chunk* chunk = mem::new(Chunk);
+			compiler::compile(line, chunk);
+			vm.interpret(chunk)!;
+		};
 	}
 }

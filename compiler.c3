@@ -5,7 +5,7 @@ import std::io;
 import scanner;
 import vm;
 
-fn Chunk compile(char[] src) {
+fn void compile(char[] src, Chunk* chunk) {
 	scanner::Scanner scnr;
 	scnr.init(src);
 
@@ -29,5 +29,5 @@ fn Chunk compile(char[] src) {
 		if (token.type == EOF) break;
 	}
 
-	return {};
+	return;
 }

@@ -15,7 +15,7 @@ fault InterpretError {
 	RUNTIME_ERROR,
 }
 
-fn void! Vm.interpret(&vm, Chunk chunk) {
+fn void! Vm.interpret(&vm, Chunk* chunk) {
 	if (chunk.code.len() == 0) return;
 
 	while(true) {
