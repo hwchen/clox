@@ -5,7 +5,7 @@ import std::io;
 import scanner;
 import vm;
 
-fn void compile(char[] src, Chunk* chunk) {
+fn void! compile(char[] src, Chunk* chunk) {
 	scanner::Scanner scnr;
 	scnr.init(src);
 

@@ -10,11 +10,6 @@ struct Vm {
 	List(<Value>) stack;
 }
 
-fault InterpretError {
-	COMPILER_ERROR,
-	RUNTIME_ERROR,
-}
-
 fn void! Vm.interpret(&vm, Chunk* chunk) {
 	if (chunk.code.len() == 0) return;
 

@@ -8,11 +8,7 @@ import vm;
 
 fn int main(String[] args) {
 	if (args.len == 1) {
-		if ( catch error = repl()) {
-			io::eprintfn("Error in repl: %s", error);
-			// TODO also grab scanner errors here?
-			return 77;
-		}
+		repl();
 	} else if (args.len == 2) {
 		//run_file(os.args[1])
 		io::eprintn("Files not yet supported");
@@ -24,16 +20,24 @@ fn int main(String[] args) {
 	return 0;
 }
 
-fn void! repl() {
+fn void repl() {
 	Vm vm;
 
 	while (true) {
 		io::print("> ");
 		@pool() {
-			String line = io::readline(io::stdin())!;
+			String! line = io::treadline(io::stdin());
+			if (catch error = line) {
+				if (error == IoError.EOF) return;
+				io::eprintfn("Readline error: %s", error);
+			}
 			Chunk* chunk = mem::new(Chunk);
-			compiler::compile(line, chunk);
-			vm.interpret(chunk)!;
+			if (catch error = compiler::compile(line, chunk)) {
+				io::eprintfn("Compiler error: %s", error);
+			}
+			if (catch error = vm.interpret(chunk)) {
+				io::eprintfn("Interpreter error: %s", error);
+			}
 		};
 	}
 }
