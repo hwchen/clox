@@ -29,7 +29,7 @@ fn void! Vm.interpret(&vm, Chunk* chunk) {
 		$endif
 
 		OpCode opcode = (OpCode)chunk.code[vm.ip];
-		vm.ip += 1;
+		vm.ip += 1; // TODO: should this defer?
 		switch (opcode) {
 			case CONSTANT:
 				int const_idx = chunk.code[vm.ip];
