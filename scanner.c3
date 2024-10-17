@@ -235,6 +235,6 @@ enum TokenType : char {
 	ERROR,
 }
 
-fn char[] token_lexeme(Token token, char[] src) {
-	return src[token.start:token.length];
+fn String Scanner.lexeme(&self, Token token) {
+	return (String)self.src[token.start:token.length];
 }

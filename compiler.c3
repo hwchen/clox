@@ -28,7 +28,14 @@ struct Parser {
 	Chunk*           compiling_chunk;
 }
 
-fn void Parser.advance(&self) {}
+fn void Parser.advance(&self) {
+	self.previous = self.current;
+	while (true) {
+		self.current = self.scnr.token();
+		if (self.current.type != ERROR) break;
+		self.error_at_current(self.scnr.lexeme(self.current));
+	}
+}
 fn void Parser.expression(&self) {}
 fn void Parser.consume(&self, TokenType token_type, String err_msg) {
 	if (self.current.type == token_type) {
