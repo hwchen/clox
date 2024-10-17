@@ -30,6 +30,24 @@ struct Parser {
 
 fn void Parser.expression(&self) {}
 
+fn void Parser.number(&self) {
+	String s = self.scnr.lexeme(self.previous);
+	double! val = s.to_float();
+	if (try val) {
+		self.emit_bytes((char)OpCode.CONSTANT, self.make_constant((Value)val));
+	} else {
+		self.emit_bytes((char)OpCode.CONSTANT, self.make_constant((Value)0.0));
+	}
+}
+fn char Parser.make_constant(&self, Value value) {
+	int const_idx = self.current_chunk().add_constant(value);
+	if (const_idx > char.max) {
+		self.error("Too many constants in one chunk");
+		return 0;
+	}
+	return (char)const_idx;
+}
+
 // === advancing ===
 
 fn void Parser.advance(&self) {
