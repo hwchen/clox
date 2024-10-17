@@ -92,6 +92,8 @@ fn void Chunk.write_instruction(&self, OpCode opcode, int line, char... bytes) {
 }
 
 // Writes constant instruction (with idx to constant), as well as the constant itself.
+// Just like write_instruction, but needs to also check that possible number of constants
+// addressable by one byte is not exceeded.
 fn void! Chunk.write_constant(&self, Value v, int line) {
 	self.constants.push(v);
 	usz const_idx = self.constants.len() - 1;
