@@ -28,6 +28,10 @@ struct Parser {
 	Chunk*           compiling_chunk;
 }
 
+fn void Parser.expression(&self) {}
+
+// === advancing ===
+
 fn void Parser.advance(&self) {
 	self.previous = self.current;
 	while (true) {
@@ -36,7 +40,6 @@ fn void Parser.advance(&self) {
 		self.error_at_current(self.scnr.lexeme(self.current));
 	}
 }
-fn void Parser.expression(&self) {}
 fn void Parser.consume(&self, TokenType token_type, String err_msg) {
 	if (self.current.type == token_type) {
 		self.advance();
@@ -44,6 +47,9 @@ fn void Parser.consume(&self, TokenType token_type, String err_msg) {
 	}
 	self.error_at_current(err_msg);
 }
+
+// === error handling ===
+
 fn void Parser.error_at_current(&self, String msg) {
 	self.error_at(&self.current, msg);
 }
@@ -68,6 +74,9 @@ fn void Parser.error_at(&self, Token* token, String msg) {
 	io::eprintfn(": %s", msg);
 	self.had_error = true;
 }
+
+// === emit bytes ===
+
 fn Chunk* Parser.current_chunk(&self) {
 	return self.compiling_chunk;
 }
