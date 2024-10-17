@@ -28,7 +28,7 @@ fn void repl() {
 		@pool() {
 			String! line = io::treadline(io::stdin());
 			if (catch error = line) {
-				if (error == IoError.EOF) return;
+				if (error == IoError.EOF) return; // Ctrl-D
 				io::eprintfn("Readline error: %s", error);
 			}
 			Chunk* chunk = mem::temp_new(Chunk);
