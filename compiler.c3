@@ -5,29 +5,25 @@ import std::io;
 import scanner;
 import vm;
 
+// Both parses and generates bytecode (single-pass)
 fn void! compile(char[] src, Chunk* chunk) {
 	scanner::Scanner scnr;
 	scnr.init(src);
+	Parser p = {.scnr = scnr};
 
-	// temporary to drive the scanner
-	int line = -1;
-	while (true) {
-		Token token = scnr.token();
-		if (token.line != line) {
-			io::printf("%04d ", token.line);
-			line = token.line;
-		} else {
-			io::print("   |");
-		}
-		io::printf("%s '%s'", token.type, (String)scanner::token_lexeme(token, src));
-		if (token.type == ERROR) {
-			io::printfn(" Error: %s", scnr.err_msg);
-		} else {
-			io::printn();
-		}
-
-		if (token.type == EOF) break;
-	}
+	p.advance();
+	p.expression();
+	p.consume(TokenType.EOF, "expect end of expression.");
 
 	return;
 }
+
+struct Parser {
+	scanner::Scanner scnr;
+	Token            current;
+	Token            previous;
+}
+
+fn void Parser.advance(&self) {}
+fn void Parser.expression(&self) {}
+fn void Parser.consume(&self, TokenType token_type, String err_msg) {}
