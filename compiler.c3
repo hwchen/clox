@@ -29,8 +29,9 @@ struct Parser {
 	Chunk*           compiling_chunk;
 }
 
-fn void Parser.expression(&self) {}
-
+fn void Parser.expression(&self) {
+	self.parse_precedence(ASSIGNMENT);
+}
 fn void Parser.number(&self) {
 	String s = self.scnr.lexeme(self.previous);
 	double! val = s.to_float();
@@ -41,21 +42,109 @@ fn void Parser.number(&self) {
 		self.error(string::tformat("%s", err));
 	}
 }
-
 fn void Parser.grouping(&self) {
 	self.expression();
 	self.consume(RIGHT_PAREN, "Expect ')' after expression");
 }
-
 fn void Parser.unary(&self) {
-	TokenType token_type = self.previous.type;
+	TokenType op_type = self.previous.type;
 	// Note order of parsing, negation should be above operand on stack
-	self.expression();
-	switch (token_type) {
+	self.parse_precedence(UNARY);
+	switch (op_type) {
 		case MINUS: self.emit_instruction(NEGATE);
 		default: $$unreachable();
 	}
 }
+fn void Parser.binary(&self) {
+	TokenType op_type = self.previous.type;
+	// Note order of parsing, negation should be above operand on stack
+	ParseRule* rule = self.get_rule(op_type);
+	self.parse_precedence(rule.precedence + 1);
+	switch (op_type) {
+		case PLUS:  self.emit_instruction(ADD);
+		case MINUS: self.emit_instruction(SUBTRACT);
+		case STAR:  self.emit_instruction(MULTIPLY);
+		case SLASH: self.emit_instruction(DIVIDE);
+		default: $$unreachable();
+	}
+}
+fn void Parser.parse_precedence(&self, Precedence precedence) {
+	self.advance();
+	ParseFn prefix_rule = self.get_rule(self.previous.type).prefix;
+	if (prefix_rule == null) {
+		self.error("expect expression");
+	}
+	prefix_rule(self);
+	while (precedence <= self.get_rule(self.current.type).precedence) {
+		self.advance();
+		ParseFn infix_rule = self.get_rule(self.previous.type).infix;
+		infix_rule(self);
+	}
+}
+fn ParseRule* Parser.get_rule(&self, TokenType token_type) {
+	return &rules[token_type];
+}
+struct ParseRule {
+	ParseFn prefix;
+	ParseFn infix;
+	Precedence precedence;
+}
+def ParseFn = fn void(Parser*);
+enum Precedence {
+	NONE,
+	ASSIGNMENT,  // =
+	OR,          // or
+	AND,         // and
+	EQUALITY,    // == !=
+	COMPARISON,  // < > <= >=
+	TERM,        // + -
+	FACTOR,      // * /
+	UNARY,       // ! -
+	CALL,        // . ()
+	PRIMARY,
+}
+ParseRule[] rules = {
+	{&Parser.grouping, null,           NONE},   //[LEFT_PAREN]
+	{null,             null,           NONE},   //[RIGHT_PAREN]
+	{null,             null,           NONE},   //[LEFT_BRACE]
+	{null,             null,           NONE},   //[RIGHT_BRACE]
+	{null,             null,           NONE},   //[COMMA]
+	{null,             null,           NONE},   //[DOT]
+	{&Parser.unary,    &Parser.binary, TERM},   //[MINUS]
+	{null,             &Parser.binary, TERM},   //[PLUS]
+	{null,             null,           NONE},   //[SEMICOLON]
+	{null,             &Parser.binary, FACTOR}, //[SLASH]
+	{null,             &Parser.binary, FACTOR}, //[STAR]
+	{null,             null,           NONE},   //[BANG]
+	{null,             null,           NONE},   //[BANG_EQUAL]
+	{null,             null,           NONE},   //[EQUAL]
+	{null,             null,           NONE},   //[EQUAL_EQUAL]
+	{null,             null,           NONE},   //[GREATER]
+	{null,             null,           NONE},   //[GREATER_EQUAL]
+	{null,             null,           NONE},   //[LESS]
+	{null,             null,           NONE},   //[LESS_EQUAL]
+	{null,             null,           NONE},   //[IDENTIFIER]
+	{null,             null,           NONE},   //[STRING]
+	{&Parser.number,   null,           NONE},   //[NUMBER]
+	{null,             null,           NONE},   //[AND]
+	{null,             null,           NONE},   //[CLASS]
+	{null,             null,           NONE},   //[ELSE]
+	{null,             null,           NONE},   //[FALSE]
+	{null,             null,           NONE},   //[FOR]
+	{null,             null,           NONE},   //[FUN]
+	{null,             null,           NONE},   //[IF]
+	{null,             null,           NONE},   //[NIL]
+	{null,             null,           NONE},   //[OR]
+	{null,             null,           NONE},   //[PRINT]
+	{null,             null,           NONE},   //[RETURN
+	{null,             null,           NONE},   //[SUPER]
+	{null,             null,           NONE},   //[THIS]
+	{null,             null,           NONE},   //[TRUE]
+	{null,             null,           NONE},   //[VAR]
+	{null,             null,           NONE},   //[WHILE]
+	{null,             null,           NONE},   //[ERROR]
+	{null,             null,           NONE},   //[EOF]
+};
 
 // === advancing ===
 
