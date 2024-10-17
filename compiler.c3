@@ -40,7 +40,21 @@ fn void Parser.number(&self) {
 	if (catch err = self.emit_constant(val)) {
 		self.error(string::tformat("%s", err));
 	}
+}
 
+fn void Parser.grouping(&self) {
+	self.expression();
+	self.consume(RIGHT_PAREN, "Expect ')' after expression");
+}
+
+fn void Parser.unary(&self) {
+	TokenType token_type = self.previous.type;
+	// Note order of parsing, negation should be above operand on stack
+	self.expression();
+	switch (token_type) {
+		case MINUS: self.emit_instruction(NEGATE);
+		default: $$unreachable();
+	}
 }
 
 // === advancing ===
