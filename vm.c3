@@ -70,7 +70,7 @@ enum OpCode : char {
 	RETURN,
 }
 
-distinct Value = double;
+def Value = double;
 
 struct Chunk {
 	List(<char>)  code;
@@ -84,15 +84,25 @@ fn void Chunk.write(&self, char byte, int line) {
 	self.lines.push(line);
 }
 
-fn void Chunk.write_constant(&self, Value v, int line) {
-	int const_idx = self.add_constant((Value)v);
-	self.write((char)OpCode.CONSTANT, line);
-	self.write((char)const_idx, line);
+fn void Chunk.write_instruction(&self, OpCode opcode, int line, char... bytes) {
+	self.write((char)opcode, line);
+	foreach (byte : bytes) {
+		self.write(byte, line);
+	}
 }
 
-fn int Chunk.add_constant(&self, Value value) {
-	self.constants.push(value);
-	return (char)self.constants.len() - 1;
+// Writes constant instruction (with idx to constant), as well as the constant itself.
+fn void! Chunk.write_constant(&self, Value v, int line) {
+	self.constants.push(v);
+	usz const_idx = self.constants.len() - 1;
+	if (const_idx > char.max) {
+		return ChunkError.TOO_MANY_CONSTANTS?;
+	}
+	self.write_instruction(CONSTANT, line, (char)const_idx);
+}
+
+fault ChunkError {
+	TOO_MANY_CONSTANTS,
 }
 
 fn void Chunk.disassemble(&self, String label) {

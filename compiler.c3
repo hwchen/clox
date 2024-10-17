@@ -1,6 +1,7 @@
 module compiler;
 
 import std::io;
+import std::core::string;
 
 import scanner;
 import vm;
@@ -14,7 +15,7 @@ fn bool compile(char[] src, Chunk* chunk) {
 	p.advance();
 	p.expression();
 	p.consume(TokenType.EOF, "expect end of expression.");
-	p.end_compiler();
+	p.emit_instruction(RETURN);
 
 	return p.had_error;
 }
@@ -33,19 +34,13 @@ fn void Parser.expression(&self) {}
 fn void Parser.number(&self) {
 	String s = self.scnr.lexeme(self.previous);
 	double! val = s.to_float();
-	if (try val) {
-		self.emit_bytes((char)OpCode.CONSTANT, self.make_constant((Value)val));
-	} else {
-		self.emit_bytes((char)OpCode.CONSTANT, self.make_constant((Value)0.0));
+	if (catch val) {
+		val = 0;
 	}
-}
-fn char Parser.make_constant(&self, Value value) {
-	int const_idx = self.current_chunk().add_constant(value);
-	if (const_idx > char.max) {
-		self.error("Too many constants in one chunk");
-		return 0;
+	if (catch err = self.emit_constant(val)) {
+		self.error(string::tformat("%s", err));
 	}
-	return (char)const_idx;
+
 }
 
 // === advancing ===
@@ -93,7 +88,7 @@ fn void Parser.error_at(&self, Token* token, String msg) {
 	self.had_error = true;
 }
 
-// === emit bytes ===
+// === emit to chunk ===
 
 fn Chunk* Parser.current_chunk(&self) {
 	return self.compiling_chunk;
@@ -101,13 +96,9 @@ fn Chunk* Parser.current_chunk(&self) {
 fn void Parser.emit_byte(&self, char byte) {
 	self.current_chunk().write(byte, self.previous.line);
 }
-fn void Parser.emit_bytes(&self, char byte1, char byte2) {
-	self.emit_byte(byte1);
-	self.emit_byte(byte2);
+fn void Parser.emit_instruction(&self, OpCode opcode, char... bytes) {
+	self.current_chunk().write_instruction(opcode, self.previous.line, ...bytes);
 }
-fn void Parser.emit_return(&self) {
-	self.emit_byte((char)OpCode.RETURN);
-}
-fn void Parser.end_compiler(&self) {
-	self.emit_return();
+fn void! Parser.emit_constant(&self, Value value) {
+	return self.current_chunk().write_constant(value, self.previous.line);
 }
