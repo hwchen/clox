@@ -9,11 +9,12 @@ import vm;
 fn bool compile(char[] src, Chunk* chunk) {
 	scanner::Scanner scnr;
 	scnr.init(src);
-	Parser p = {.scnr = scnr};
+	Parser p = {.scnr = scnr, .compiling_chunk = chunk};
 
 	p.advance();
 	p.expression();
 	p.consume(TokenType.EOF, "expect end of expression.");
+	p.end_compiler();
 
 	return p.had_error;
 }
@@ -24,6 +25,7 @@ struct Parser {
 	Token            previous;
 	bool             had_error;
 	bool             panic_mode; // suppresses additional errs til cleared at end of stmt
+	Chunk*           compiling_chunk;
 }
 
 fn void Parser.advance(&self) {}
@@ -58,4 +60,20 @@ fn void Parser.error_at(&self, Token* token, String msg) {
 	}
 	io::eprintfn(": %s", msg);
 	self.had_error = true;
+}
+fn Chunk* Parser.current_chunk(&self) {
+	return self.compiling_chunk;
+}
+fn void Parser.emit_byte(&self, char byte) {
+	self.current_chunk().write(byte, self.previous.line);
+}
+fn void Parser.emit_bytes(&self, char byte1, char byte2) {
+	self.emit_byte(byte1);
+	self.emit_byte(byte2);
+}
+fn void Parser.emit_return(&self) {
+	self.emit_byte((char)OpCode.RETURN);
+}
+fn void Parser.end_compiler(&self) {
+	self.emit_return();
 }
