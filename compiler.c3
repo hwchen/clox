@@ -34,10 +34,7 @@ fn void Parser.expression(&self) {
 }
 fn void Parser.number(&self) {
 	String s = self.scnr.lexeme(self.previous);
-	double! val = s.to_float();
-	if (catch val) {
-		val = 0;
-	}
+	double val = s.to_float() ?? 0;
 	if (catch err = self.emit_constant(val)) {
 		self.error(string::tformat("%s", err));
 	}
