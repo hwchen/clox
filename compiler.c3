@@ -3,8 +3,8 @@ module compiler;
 import std::io;
 import std::core::string;
 
+import chunk;
 import scanner;
-import vm;
 
 // Both parses and generates bytecode (single-pass)
 fn bool compile(char[] src, Chunk* chunk) {

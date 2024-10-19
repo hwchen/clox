@@ -3,6 +3,7 @@ module clox;
 import std::io;
 import std::core::mem;
 
+import chunk;
 import compiler;
 import vm;
 
