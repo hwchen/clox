@@ -12,6 +12,7 @@ struct Vm {
 
 fn void! Vm.interpret(&vm, Chunk* chunk) {
 	if (chunk.code.len() == 0) return;
+	vm.ip = 0;
 
 	while(true) {
 		$if $feature(DEBUG_TRACE_EXECUTION):
@@ -130,7 +131,7 @@ fn int instruction_disassemble(Chunk* chunk, int offset) {
 		case CONSTANT:
 			int const_idx = chunk.code[(usz)offset + 1];
 			Value const_val = chunk.constants[const_idx];
-			io::printfn("%-16s %4d '%f'", opcode, const_idx, const_val);
+			io::printfn("%-16s %4d '%d'", opcode, const_idx, const_val);
 			return offset + 2;
 		case NEGATE:
 		case ADD:
