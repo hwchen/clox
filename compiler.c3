@@ -17,6 +17,10 @@ fn bool compile(char[] src, Chunk* chunk) {
 	p.consume(TokenType.EOF, "expect end of expression.");
 	p.emit_instruction(RETURN);
 
+	$if $feature(DEBUG_PRINT_CODE):
+		p.current_chunk().disassemble("code");
+	$endif
+
 	return p.had_error;
 }
 
