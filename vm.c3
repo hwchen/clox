@@ -17,10 +17,10 @@ fn void! Vm.interpret(&vm, Chunk* chunk) {
 		$if $feature(DEBUG_TRACE_EXECUTION):
 			io::printf("     ");
 			foreach (v : vm.stack) {
-				io::printf("[ %v ]", v);
+				io::printf("[ %f ]", v);
 			}
 			io::printn();
-			instruction_disassemble(&chunk, vm.ip);
+			instruction_disassemble(chunk, vm.ip);
 		$endif
 
 		OpCode opcode = (OpCode)chunk.code[vm.ip];
@@ -54,7 +54,7 @@ fn void! Vm.interpret(&vm, Chunk* chunk) {
 				}
 			case RETURN:
 				Value constant = vm.stack.pop()!;
-				io::printfn("%v", constant);
+				io::printfn("%f", constant);
 				return;
 		}
 	}
@@ -130,7 +130,7 @@ fn int instruction_disassemble(Chunk* chunk, int offset) {
 		case CONSTANT:
 			int const_idx = chunk.code[(usz)offset + 1];
 			Value const_val = chunk.constants[const_idx];
-			io::printfn("%-16s %4d '%v'", opcode, const_idx, const_val);
+			io::printfn("%-16s %4d '%f'", opcode, const_idx, const_val);
 			return offset + 2;
 		case NEGATE:
 		case ADD:
