@@ -106,46 +106,46 @@ enum Precedence {
 	PRIMARY,
 }
 ParseRule[] rules = {
-	{&Parser.grouping, null,           NONE},   //[LEFT_PAREN]
-	{null,             null,           NONE},   //[RIGHT_PAREN]
-	{null,             null,           NONE},   //[LEFT_BRACE]
-	{null,             null,           NONE},   //[RIGHT_BRACE]
-	{null,             null,           NONE},   //[COMMA]
-	{null,             null,           NONE},   //[DOT]
-	{&Parser.unary,    &Parser.binary, TERM},   //[MINUS]
-	{null,             &Parser.binary, TERM},   //[PLUS]
-	{null,             null,           NONE},   //[SEMICOLON]
-	{null,             &Parser.binary, FACTOR}, //[SLASH]
-	{null,             &Parser.binary, FACTOR}, //[STAR]
-	{null,             null,           NONE},   //[BANG]
-	{null,             null,           NONE},   //[BANG_EQUAL]
-	{null,             null,           NONE},   //[EQUAL]
-	{null,             null,           NONE},   //[EQUAL_EQUAL]
-	{null,             null,           NONE},   //[GREATER]
-	{null,             null,           NONE},   //[GREATER_EQUAL]
-	{null,             null,           NONE},   //[LESS]
-	{null,             null,           NONE},   //[LESS_EQUAL]
-	{null,             null,           NONE},   //[IDENTIFIER]
-	{null,             null,           NONE},   //[STRING]
-	{&Parser.number,   null,           NONE},   //[NUMBER]
-	{null,             null,           NONE},   //[AND]
-	{null,             null,           NONE},   //[CLASS]
-	{null,             null,           NONE},   //[ELSE]
-	{null,             null,           NONE},   //[FALSE]
-	{null,             null,           NONE},   //[FOR]
-	{null,             null,           NONE},   //[FUN]
-	{null,             null,           NONE},   //[IF]
-	{null,             null,           NONE},   //[NIL]
-	{null,             null,           NONE},   //[OR]
-	{null,             null,           NONE},   //[PRINT]
-	{null,             null,           NONE},   //[RETURN
-	{null,             null,           NONE},   //[SUPER]
-	{null,             null,           NONE},   //[THIS]
-	{null,             null,           NONE},   //[TRUE]
-	{null,             null,           NONE},   //[VAR]
-	{null,             null,           NONE},   //[WHILE]
-	{null,             null,           NONE},   //[ERROR]
-	{null,             null,           NONE},   //[EOF]
+	[TokenType.LEFT_PAREN]    = {&Parser.grouping, null,           NONE},
+	[TokenType.RIGHT_PAREN]   = {null,             null,           NONE},
+	[TokenType.LEFT_BRACE]    = {null,             null,           NONE},
+	[TokenType.RIGHT_BRACE]   = {null,             null,           NONE},
+	[TokenType.COMMA]         = {null,             null,           NONE},
+	[TokenType.DOT]           = {null,             null,           NONE},
+	[TokenType.MINUS]         = {&Parser.unary,    &Parser.binary, TERM},
+	[TokenType.PLUS]          = {null,             &Parser.binary, TERM},
+	[TokenType.SEMICOLON]     = {null,             null,           NONE},
+	[TokenType.SLASH]         = {null,             &Parser.binary, FACTOR},
+	[TokenType.STAR]          = {null,             &Parser.binary, FACTOR},
+	[TokenType.BANG]          = {null,             null,           NONE},
+	[TokenType.BANG_EQUAL]    = {null,             null,           NONE},
+	[TokenType.EQUAL]         = {null,             null,           NONE},
+	[TokenType.EQUAL_EQUAL]   = {null,             null,           NONE},
+	[TokenType.GREATER]       = {null,             null,           NONE},
+	[TokenType.GREATER_EQUAL] = {null,             null,           NONE},
+	[TokenType.LESS]          = {null,             null,           NONE},
+	[TokenType.LESS_EQUAL]    = {null,             null,           NONE},
+	[TokenType.IDENTIFIER]    = {null,             null,           NONE},
+	[TokenType.STRING]        = {null,             null,           NONE},
+	[TokenType.NUMBER]        = {&Parser.number,   null,           NONE},
+	[TokenType.AND]           = {null,             null,           NONE},
+	[TokenType.CLASS]         = {null,             null,           NONE},
+	[TokenType.ELSE]          = {null,             null,           NONE},
+	[TokenType.FALSE]         = {null,             null,           NONE},
+	[TokenType.FOR]           = {null,             null,           NONE},
+	[TokenType.FUN]           = {null,             null,           NONE},
+	[TokenType.IF]            = {null,             null,           NONE},
+	[TokenType.NIL]           = {null,             null,           NONE},
+	[TokenType.OR]            = {null,             null,           NONE},
+	[TokenType.PRINT]         = {null,             null,           NONE},
+	[TokenType.RETURN]        = {null,             null,           NONE},
+	[TokenType.SUPER]         = {null,             null,           NONE},
+	[TokenType.THIS]          = {null,             null,           NONE},
+	[TokenType.TRUE]          = {null,             null,           NONE},
+	[TokenType.VAR]           = {null,             null,           NONE},
+	[TokenType.WHILE]         = {null,             null,           NONE},
+	[TokenType.ERROR]         = {null,             null,           NONE},
+	[TokenType.EOF]           = {null,             null,           NONE},
 };
 
 // === advancing ===
