@@ -8,9 +8,9 @@ import scanner;
 
 // Both parses and generates bytecode (single-pass)
 fn bool compile(char[] src, Chunk* chunk) {
-	scanner::Scanner scnr;
-	scnr.init(src);
-	Parser p = {.scnr = scnr, .compiling_chunk = chunk};
+	scanner::Scanner scanner;
+	scanner.init(src);
+	Parser p = {.scanner = scanner, .compiling_chunk = chunk};
 
 	p.advance();
 	p.expression();
@@ -25,7 +25,7 @@ fn bool compile(char[] src, Chunk* chunk) {
 }
 
 struct Parser {
-	scanner::Scanner scnr;
+	scanner::Scanner scanner;
 	Token            current;
 	Token            previous;
 	bool             had_error;
@@ -37,7 +37,7 @@ fn void Parser.expression(&p) {
 	p.parse_precedence(ASSIGNMENT);
 }
 fn void Parser.number(&p) {
-	String s = p.scnr.lexeme(p.previous);
+	String s = p.scanner.lexeme(p.previous);
 	double val = s.to_float() ?? 0;
 	if (catch err = p.emit_constant(val)) {
 		p.error(string::tformat("%s", err));
@@ -153,9 +153,9 @@ ParseRule[] rules = {
 fn void Parser.advance(&p) {
 	p.previous = p.current;
 	while (true) {
-		p.current = p.scnr.token();
+		p.current = p.scanner.token();
 		if (p.current.type != ERROR) break;
-		p.error_at_current(p.scnr.lexeme(p.current));
+		p.error_at_current(p.scanner.lexeme(p.current));
 	}
 }
 fn void Parser.consume(&p, TokenType token_type, String err_msg) {
