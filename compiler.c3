@@ -33,57 +33,57 @@ struct Parser {
 	Chunk*           compiling_chunk;
 }
 
-fn void Parser.expression(&self) {
-	self.parse_precedence(ASSIGNMENT);
+fn void Parser.expression(&p) {
+	p.parse_precedence(ASSIGNMENT);
 }
-fn void Parser.number(&self) {
-	String s = self.scnr.lexeme(self.previous);
+fn void Parser.number(&p) {
+	String s = p.scnr.lexeme(p.previous);
 	double val = s.to_float() ?? 0;
-	if (catch err = self.emit_constant(val)) {
-		self.error(string::tformat("%s", err));
+	if (catch err = p.emit_constant(val)) {
+		p.error(string::tformat("%s", err));
 	}
 }
-fn void Parser.grouping(&self) {
-	self.expression();
-	self.consume(RIGHT_PAREN, "Expect ')' after expression");
+fn void Parser.grouping(&p) {
+	p.expression();
+	p.consume(RIGHT_PAREN, "Expect ')' after expression");
 }
-fn void Parser.unary(&self) {
-	TokenType op_type = self.previous.type;
+fn void Parser.unary(&p) {
+	TokenType op_type = p.previous.type;
 	// Note order of parsing, negation should be above operand on stack
-	self.parse_precedence(UNARY);
+	p.parse_precedence(UNARY);
 	switch (op_type) {
-		case MINUS: self.emit_instruction(NEGATE);
+		case MINUS: p.emit_instruction(NEGATE);
 		default: $$unreachable();
 	}
 }
-fn void Parser.binary(&self) {
-	TokenType op_type = self.previous.type;
+fn void Parser.binary(&p) {
+	TokenType op_type = p.previous.type;
 	// Note order of parsing, negation should be above operand on stack
-	ParseRule* rule = self.get_rule(op_type);
-	self.parse_precedence(rule.precedence + 1);
+	ParseRule* rule = p.get_rule(op_type);
+	p.parse_precedence(rule.precedence + 1);
 	switch (op_type) {
-		case PLUS:  self.emit_instruction(ADD);
-		case MINUS: self.emit_instruction(SUBTRACT);
-		case STAR:  self.emit_instruction(MULTIPLY);
-		case SLASH: self.emit_instruction(DIVIDE);
+		case PLUS:  p.emit_instruction(ADD);
+		case MINUS: p.emit_instruction(SUBTRACT);
+		case STAR:  p.emit_instruction(MULTIPLY);
+		case SLASH: p.emit_instruction(DIVIDE);
 		default: $$unreachable();
 	}
 }
-fn void Parser.parse_precedence(&self, Precedence precedence) {
-	self.advance();
-	ParseFn prefix_rule = self.get_rule(self.previous.type).prefix;
+fn void Parser.parse_precedence(&p, Precedence precedence) {
+	p.advance();
+	ParseFn prefix_rule = p.get_rule(p.previous.type).prefix;
 	if (prefix_rule == null) {
-		self.error("expect expression");
+		p.error("expect expression");
 		return;
 	}
-	prefix_rule(self);
-	while (precedence <= self.get_rule(self.current.type).precedence) {
-		self.advance();
-		ParseFn infix_rule = self.get_rule(self.previous.type).infix;
-		infix_rule(self);
+	prefix_rule(p);
+	while (precedence <= p.get_rule(p.current.type).precedence) {
+		p.advance();
+		ParseFn infix_rule = p.get_rule(p.previous.type).infix;
+		infix_rule(p);
 	}
 }
-fn ParseRule* Parser.get_rule(&self, TokenType token_type) {
+fn ParseRule* Parser.get_rule(&p, TokenType token_type) {
 	return &rules[token_type];
 }
 struct ParseRule {
@@ -150,33 +150,33 @@ ParseRule[] rules = {
 
 // === advancing ===
 
-fn void Parser.advance(&self) {
-	self.previous = self.current;
+fn void Parser.advance(&p) {
+	p.previous = p.current;
 	while (true) {
-		self.current = self.scnr.token();
-		if (self.current.type != ERROR) break;
-		self.error_at_current(self.scnr.lexeme(self.current));
+		p.current = p.scnr.token();
+		if (p.current.type != ERROR) break;
+		p.error_at_current(p.scnr.lexeme(p.current));
 	}
 }
-fn void Parser.consume(&self, TokenType token_type, String err_msg) {
-	if (self.current.type == token_type) {
-		self.advance();
+fn void Parser.consume(&p, TokenType token_type, String err_msg) {
+	if (p.current.type == token_type) {
+		p.advance();
 		return;
 	}
-	self.error_at_current(err_msg);
+	p.error_at_current(err_msg);
 }
 
 // === error handling ===
 
-fn void Parser.error_at_current(&self, String msg) {
-	self.error_at(&self.current, msg);
+fn void Parser.error_at_current(&p, String msg) {
+	p.error_at(&p.current, msg);
 }
-fn void Parser.error(&self, String msg) {
-	self.error_at(&self.previous, msg);
+fn void Parser.error(&p, String msg) {
+	p.error_at(&p.previous, msg);
 }
-fn void Parser.error_at(&self, Token* token, String msg) {
-	if (self.panic_mode) return;
-	self.panic_mode = true;
+fn void Parser.error_at(&p, Token* token, String msg) {
+	if (p.panic_mode) return;
+	p.panic_mode = true;
 
 	// TODO better way to handle this? Don't want to print this deep.
 	// Instead could return an error message through `compile` instead of just a bool
@@ -190,20 +190,20 @@ fn void Parser.error_at(&self, Token* token, String msg) {
 		io::eprintf(" at %.*s", token.length, token.start);
 	}
 	io::eprintfn(": %s", msg);
-	self.had_error = true;
+	p.had_error = true;
 }
 
 // === emit to chunk ===
 
-fn Chunk* Parser.current_chunk(&self) {
-	return self.compiling_chunk;
+fn Chunk* Parser.current_chunk(&p) {
+	return p.compiling_chunk;
 }
-fn void Parser.emit_byte(&self, char byte) {
-	self.current_chunk().write(byte, self.previous.line);
+fn void Parser.emit_byte(&p, char byte) {
+	p.current_chunk().write(byte, p.previous.line);
 }
-fn void Parser.emit_instruction(&self, OpCode opcode, char... bytes) {
-	self.current_chunk().write_instruction(opcode, self.previous.line, ...bytes);
+fn void Parser.emit_instruction(&p, OpCode opcode, char... bytes) {
+	p.current_chunk().write_instruction(opcode, p.previous.line, ...bytes);
 }
-fn void! Parser.emit_constant(&self, Value value) {
-	return self.current_chunk().write_constant(value, self.previous.line);
+fn void! Parser.emit_constant(&p, Value value) {
+	return p.current_chunk().write_constant(value, p.previous.line);
 }
