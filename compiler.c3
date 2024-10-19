@@ -70,6 +70,7 @@ fn void Parser.parse_precedence(&self, Precedence precedence) {
 	ParseFn prefix_rule = self.get_rule(self.previous.type).prefix;
 	if (prefix_rule == null) {
 		self.error("expect expression");
+		return;
 	}
 	prefix_rule(self);
 	while (precedence <= self.get_rule(self.current.type).precedence) {
