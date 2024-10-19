@@ -215,8 +215,6 @@ struct Token {
 }
 
 enum TokenType : char {
-	EOF, // 0
-
 	// single-character tokens
 	LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
 	COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
@@ -233,6 +231,8 @@ enum TokenType : char {
 	PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
 
 	ERROR,
+	EOF,
+
 }
 
 fn String Scanner.lexeme(&self, Token token) {
