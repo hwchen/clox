@@ -42,16 +42,11 @@ fn void! Vm.interpret(&vm, Chunk* chunk) {
 				Value b = vm.stack.pop()!;
 				Value a = vm.stack.pop()!;
 				switch (opcode) {
-					case ADD:
-						vm.stack.push(a + b);
-					case SUBTRACT:
-						vm.stack.push(a - b);
-					case MULTIPLY:
-						vm.stack.push(a * b);
-					case DIVIDE:
-						vm.stack.push(a / b);
-					default:
-						$$unreachable();
+					case ADD:      vm.stack.push(a + b);
+					case SUBTRACT: vm.stack.push(a - b);
+					case MULTIPLY: vm.stack.push(a * b);
+					case DIVIDE:   vm.stack.push(a / b);
+					default: $$unreachable();
 				}
 			case RETURN:
 				Value constant = vm.stack.pop()!;

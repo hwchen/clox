@@ -186,22 +186,22 @@ fn Token Scanner.make_ident_token(&self) {
 }
 
 fn TokenType! try_keyword(char[] s) {
-	if (s == "and")   return AND;
-	if (s == "class") return CLASS;
-	if (s == "else")  return ELSE;
-	if (s == "false") return FALSE;
-	if (s == "for")   return FOR;
-	if (s == "fun")   return FUN;
-	if (s == "if")    return IF;
-	if (s == "nil")   return NIL;
-	if (s == "or")    return OR;
-	if (s == "print") return PRINT;
-	if (s == "return")return RETURN;
-	if (s == "super") return SUPER;
-	if (s == "this")  return THIS;
-	if (s == "true")  return TRUE;
-	if (s == "var")   return VAR;
-	if (s == "while") return WHILE;
+	if (s == "and")    return AND;
+	if (s == "class")  return CLASS;
+	if (s == "else")   return ELSE;
+	if (s == "false")  return FALSE;
+	if (s == "for")    return FOR;
+	if (s == "fun")    return FUN;
+	if (s == "if")     return IF;
+	if (s == "nil")    return NIL;
+	if (s == "or")     return OR;
+	if (s == "print")  return PRINT;
+	if (s == "return") return RETURN;
+	if (s == "super")  return SUPER;
+	if (s == "this")   return THIS;
+	if (s == "true")   return TRUE;
+	if (s == "var")    return VAR;
+	if (s == "while")  return WHILE;
 	return SearchResult.MISSING?;
 }
 
