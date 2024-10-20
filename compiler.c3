@@ -5,6 +5,7 @@ import std::core::string;
 
 import chunk;
 import scanner;
+import value;
 
 // Both parses and generates bytecode (single-pass)
 fn bool compile(char[] src, Chunk* chunk) {
@@ -39,7 +40,7 @@ fn void Parser.expression(&p) {
 fn void Parser.number(&p) {
 	String s = p.scanner.lexeme(p.previous);
 	double val = s.to_float() ?? 0;
-	if (catch err = p.emit_constant(val)) {
+	if (catch err = p.emit_constant(value::from_number(val))) {
 		p.error(string::tformat("%s", err));
 	}
 }

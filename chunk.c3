@@ -3,6 +3,8 @@ module chunk;
 import std::io;
 import std::collections::list;
 
+import value;
+
 enum OpCode : char {
 	CONSTANT,
 	NEGATE,
@@ -12,8 +14,6 @@ enum OpCode : char {
 	DIVIDE,
 	RETURN,
 }
-
-def Value = double;
 
 struct Chunk {
 	List(<char>)  code;
@@ -73,7 +73,9 @@ fn int instruction_disassemble(Chunk* chunk, int offset) {
 		case CONSTANT:
 			int const_idx = chunk.code[(usz)offset + 1];
 			Value const_val = chunk.constants[const_idx];
-			io::printfn("%-16s %4d '%d'", opcode, const_idx, const_val);
+			io::printf("%-16s %4d '", opcode, const_idx);
+			const_val.print();
+			io::printn("'");
 			return offset + 2;
 		case NEGATE:
 		case ADD:

@@ -4,6 +4,7 @@ import std::io;
 import std::collections::list;
 
 import chunk;
+import value;
 
 struct Vm {
 	// not a pointer; book says pointers are faster, but it's not clear that's the case now.
@@ -36,23 +37,27 @@ fn void! Vm.interpret(&vm, Chunk* chunk) {
 				vm.stack.push(constant);
 			case NEGATE:
 				Value constant = vm.stack.pop()!;
-				vm.stack.push(-1 * constant);
+				double x = value::as_number(constant)!;
+				vm.stack.push(value::from_number(-1 * x));
 			case ADD:
 			case SUBTRACT:
 			case MULTIPLY:
 			case DIVIDE:
-				Value b = vm.stack.pop()!;
-				Value a = vm.stack.pop()!;
+				Value vb = vm.stack.pop()!;
+				Value va = vm.stack.pop()!;
+				double b = value::as_number(vb)!;
+				double a = value::as_number(va)!;
 				switch (opcode) {
-					case ADD:      vm.stack.push(a + b);
-					case SUBTRACT: vm.stack.push(a - b);
-					case MULTIPLY: vm.stack.push(a * b);
-					case DIVIDE:   vm.stack.push(a / b);
+					case ADD:      vm.stack.push(value::from_number(a + b));
+					case SUBTRACT: vm.stack.push(value::from_number(a - b));
+					case MULTIPLY: vm.stack.push(value::from_number(a * b));
+					case DIVIDE:   vm.stack.push(value::from_number(a / b));
 					default: $$unreachable();
 				}
 			case RETURN:
 				Value constant = vm.stack.pop()!;
-				io::printfn("%f", constant);
+				constant.print();
+				io::printn();
 				return;
 		}
 	}
