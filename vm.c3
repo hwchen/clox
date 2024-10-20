@@ -23,10 +23,12 @@ fn void! Vm.interpret(&vm, Chunk* chnk) {
 		$if $feature(DEBUG_TRACE_EXECUTION):
 			io::printf("     ");
 			foreach (v : vm.stack) {
-				io::printf("[ %f ]", v);
+				io::printf("[ ");
+				v.print();
+				io::printf(" ]");
 			}
 			io::printn();
-			instruction_disassemble(vm.chunk, vm.ip);
+			chunk::instruction_disassemble(vm.chunk, vm.ip);
 		$endif
 
 		OpCode opcode = (OpCode)vm.chunk.code[vm.ip];

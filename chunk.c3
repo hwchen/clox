@@ -80,6 +80,9 @@ fn int instruction_disassemble(Chunk* chunk, int offset) {
 			const_val.print();
 			io::printn("'");
 			return offset + 2;
+		case NIL:
+		case TRUE:
+		case FALSE:
 		case NEGATE:
 		case ADD:
 		case SUBTRACT:
