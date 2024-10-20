@@ -91,8 +91,5 @@ fn int instruction_disassemble(Chunk* chunk, int offset) {
 		case RETURN:
 			io::printfn("%s", opcode);
 			return offset + 1;
-		default:
-			io::printfn("Unknown opcode %d", opcode);
-			return offset + 1;
 	}
 }
