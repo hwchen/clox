@@ -24,13 +24,19 @@ fn Value nil() {
 fn Value from_number(double number) {
 	return {.type = NUMBER, .number = number};
 }
-fn bool! as_bool(Value v) {
-	return (v.type == BOOL) ? v.boolean : ValueError.ERR_AS_BOOL?;
+fn bool Value.is_bool(&v) {
+	return v.type == BOOL;
 }
-fn bool is_nil(Value v) {
+fn bool Value.is_nil(&v) {
 	return v.type == NIL;
 }
-fn double! as_number(Value v) {
+fn bool Value.is_number(&v) {
+	return v.type == NUMBER;
+}
+fn bool! Value.as_bool(&v) {
+	return (v.type == BOOL) ? v.boolean : ValueError.ERR_AS_BOOL?;
+}
+fn double! Value.as_number(&v) {
 	return (v.type == NUMBER) ? v.number : ValueError.ERR_AS_NUMBER?;
 }
 fn void Value.print(&v) {
