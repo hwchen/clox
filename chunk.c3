@@ -7,6 +7,9 @@ import value;
 
 enum OpCode : char {
 	CONSTANT,
+	NIL,
+	TRUE,
+	FALSE,
 	NEGATE,
 	ADD,
 	SUBTRACT,

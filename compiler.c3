@@ -44,6 +44,14 @@ fn void Parser.number(&p) {
 		p.error(string::tformat("%s", err));
 	}
 }
+fn void Parser.literal(&p) {
+	switch (p.previous.type) {
+		case FALSE: p.emit_instruction(FALSE);
+		case NIL:   p.emit_instruction(NIL);
+		case TRUE:  p.emit_instruction(TRUE);
+		default: $$unreachable();
+	}
+}
 fn void Parser.grouping(&p) {
 	p.expression();
 	p.consume(RIGHT_PAREN, "Expect ')' after expression");
@@ -132,17 +140,17 @@ ParseRule[] rules = {
 	[TokenType.AND]           = {null,             null,           NONE},
 	[TokenType.CLASS]         = {null,             null,           NONE},
 	[TokenType.ELSE]          = {null,             null,           NONE},
-	[TokenType.FALSE]         = {null,             null,           NONE},
+	[TokenType.FALSE]         = {&Parser.literal,  null,           NONE},
 	[TokenType.FOR]           = {null,             null,           NONE},
 	[TokenType.FUN]           = {null,             null,           NONE},
 	[TokenType.IF]            = {null,             null,           NONE},
-	[TokenType.NIL]           = {null,             null,           NONE},
+	[TokenType.NIL]           = {&Parser.literal,  null,           NONE},
 	[TokenType.OR]            = {null,             null,           NONE},
 	[TokenType.PRINT]         = {null,             null,           NONE},
 	[TokenType.RETURN]        = {null,             null,           NONE},
 	[TokenType.SUPER]         = {null,             null,           NONE},
 	[TokenType.THIS]          = {null,             null,           NONE},
-	[TokenType.TRUE]          = {null,             null,           NONE},
+	[TokenType.TRUE]          = {&Parser.literal,  null,           NONE},
 	[TokenType.VAR]           = {null,             null,           NONE},
 	[TokenType.WHILE]         = {null,             null,           NONE},
 	[TokenType.ERROR]         = {null,             null,           NONE},
