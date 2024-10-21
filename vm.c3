@@ -57,6 +57,13 @@ fn void! Vm.interpret(&vm, Chunk* chnk) {
 				Value constant = vm.stack.pop()!;
 				double x = constant.as_number()!;
 				vm.stack.push(value::from_number(-1 * x));
+			case EQUAL:
+				// unlike other binary ops, doesn't check before popping?
+				Value b = vm.stack.pop()!;
+				Value a = vm.stack.pop()!;
+				vm.stack.push(value::from_bool(a.equals(b)));
+			case GREATER:
+			case LESS:
 			case ADD:
 			case SUBTRACT:
 			case MULTIPLY:
@@ -71,6 +78,8 @@ fn void! Vm.interpret(&vm, Chunk* chnk) {
 				double b = vb.as_number()!;
 				double a = va.as_number()!;
 				switch (opcode) {
+					case GREATER:  vm.stack.push(value::from_bool(a > b));
+					case LESS:     vm.stack.push(value::from_bool(a < b));
 					case ADD:      vm.stack.push(value::from_number(a + b));
 					case SUBTRACT: vm.stack.push(value::from_number(a - b));
 					case MULTIPLY: vm.stack.push(value::from_number(a * b));

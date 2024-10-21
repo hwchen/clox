@@ -72,10 +72,16 @@ fn void Parser.binary(&p) {
 	ParseRule* rule = p.get_rule(op_type);
 	p.parse_precedence(rule.precedence + 1);
 	switch (op_type) {
-		case PLUS:  p.emit_ops(ADD);
-		case MINUS: p.emit_ops(SUBTRACT);
-		case STAR:  p.emit_ops(MULTIPLY);
-		case SLASH: p.emit_ops(DIVIDE);
+		case BANG_EQUAL:    p.emit_ops(EQUAL, NOT);
+		case EQUAL_EQUAL:   p.emit_ops(EQUAL);
+		case GREATER:       p.emit_ops(GREATER);
+		case GREATER_EQUAL: p.emit_ops(LESS, NOT);
+		case LESS:          p.emit_ops(LESS);
+		case LESS_EQUAL:    p.emit_ops(GREATER, NOT);
+		case PLUS:          p.emit_ops(ADD);
+		case MINUS:         p.emit_ops(SUBTRACT);
+		case STAR:          p.emit_ops(MULTIPLY);
+		case SLASH:         p.emit_ops(DIVIDE);
 		default: $$unreachable();
 	}
 }
@@ -128,13 +134,13 @@ ParseRule[] rules = {
 	[TokenType.SLASH]         = {null,             &Parser.binary, FACTOR},
 	[TokenType.STAR]          = {null,             &Parser.binary, FACTOR},
 	[TokenType.BANG]          = {&Parser.unary,    null,           NONE},
-	[TokenType.BANG_EQUAL]    = {null,             null,           NONE},
+	[TokenType.BANG_EQUAL]    = {null,             &Parser.binary, EQUALITY},
 	[TokenType.EQUAL]         = {null,             null,           NONE},
-	[TokenType.EQUAL_EQUAL]   = {null,             null,           NONE},
-	[TokenType.GREATER]       = {null,             null,           NONE},
-	[TokenType.GREATER_EQUAL] = {null,             null,           NONE},
-	[TokenType.LESS]          = {null,             null,           NONE},
-	[TokenType.LESS_EQUAL]    = {null,             null,           NONE},
+	[TokenType.EQUAL_EQUAL]   = {null,             &Parser.binary, EQUALITY},
+	[TokenType.GREATER]       = {null,             &Parser.binary, COMPARISON},
+	[TokenType.GREATER_EQUAL] = {null,             &Parser.binary, COMPARISON},
+	[TokenType.LESS]          = {null,             &Parser.binary, COMPARISON},
+	[TokenType.LESS_EQUAL]    = {null,             &Parser.binary, COMPARISON},
 	[TokenType.IDENTIFIER]    = {null,             null,           NONE},
 	[TokenType.STRING]        = {null,             null,           NONE},
 	[TokenType.NUMBER]        = {&Parser.number,   null,           NONE},

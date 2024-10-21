@@ -12,6 +12,9 @@ enum OpCode : char {
 	FALSE,
 	NOT,
 	NEGATE,
+	EQUAL,
+	GREATER,
+	LESS,
 	ADD,
 	SUBTRACT,
 	MULTIPLY,
@@ -86,6 +89,9 @@ fn int instruction_disassemble(Chunk* chunk, int offset) {
 		case FALSE:
 		case NOT:
 		case NEGATE:
+		case EQUAL:
+		case GREATER:
+		case LESS:
 		case ADD:
 		case SUBTRACT:
 		case MULTIPLY:

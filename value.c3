@@ -42,6 +42,22 @@ fn double! Value.as_number(&v) {
 fn bool Value.is_falsey(&v) {
 	return v.is_nil() || !(v.as_bool() ?? true);
 }
+fn bool Value.equals(a, Value b) {
+	if (a.type != b.type) return false;
+	switch (a.type) {
+		case BOOL:
+			bool aa = a.as_bool() ?? false;
+			bool bb = b.as_bool() ?? false;
+			return (aa == bb);
+		case NIL:
+			return true;
+		case NUMBER:
+			double aa = a.as_number() ?? 0;
+			double bb = b.as_number() ?? 0;
+			return (aa == bb);
+		default: $$unreachable();
+	}
+}
 fn void Value.print(&v) {
 	switch (v.type) {
 		case BOOL: io::printf("%s", v.boolean);
