@@ -55,7 +55,7 @@ fn void! Vm.interpret(&vm, Chunk* chnk) {
 					return VmError.RUNTIME_ERROR?;
 				}
 				Value constant = vm.stack.pop()!;
-				double x = constant.as_number()!;
+				double x = constant.number;
 				vm.stack.push(value::from_number(-1 * x));
 			case EQUAL:
 				// unlike other binary ops, doesn't check before popping?
@@ -75,8 +75,8 @@ fn void! Vm.interpret(&vm, Chunk* chnk) {
 				}
 				Value vb = vm.stack.pop()!;
 				Value va = vm.stack.pop()!;
-				double b = vb.as_number()!;
-				double a = va.as_number()!;
+				double b = vb.number;
+				double a = va.number;
 				switch (opcode) {
 					case GREATER:  vm.stack.push(value::from_bool(a > b));
 					case LESS:     vm.stack.push(value::from_bool(a < b));

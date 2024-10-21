@@ -33,28 +33,18 @@ fn bool Value.is_nil(&v) {
 fn bool Value.is_number(&v) {
 	return v.type == NUMBER;
 }
-fn bool! Value.as_bool(&v) {
-	return (v.type == BOOL) ? v.boolean : ValueError.ERR_AS_BOOL?;
-}
-fn double! Value.as_number(&v) {
-	return (v.type == NUMBER) ? v.number : ValueError.ERR_AS_NUMBER?;
-}
 fn bool Value.is_falsey(&v) {
-	return v.is_nil() || !(v.as_bool() ?? true);
+	return v.is_nil() || (v.is_bool() && !v.boolean);
 }
 fn bool Value.equals(a, Value b) {
 	if (a.type != b.type) return false;
 	switch (a.type) {
 		case BOOL:
-			bool aa = a.as_bool() ?? false;
-			bool bb = b.as_bool() ?? false;
-			return (aa == bb);
+			return (a.boolean == b.boolean);
 		case NIL:
 			return true;
 		case NUMBER:
-			double aa = a.as_number() ?? 0;
-			double bb = b.as_number() ?? 0;
-			return (aa == bb);
+			return (a.number == b.number);
 		default: $$unreachable();
 	}
 }
