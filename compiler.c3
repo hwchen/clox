@@ -16,7 +16,7 @@ fn bool compile(char[] src, Chunk* chunk) {
 	p.advance();
 	p.expression();
 	p.consume(TokenType.EOF, "expect end of expression.");
-	p.emit_instruction(RETURN);
+	p.emit_ops(RETURN);
 
 	$if $feature(DEBUG_PRINT_CODE):
 		p.current_chunk().disassemble("code");
@@ -46,9 +46,9 @@ fn void Parser.number(&p) {
 }
 fn void Parser.literal(&p) {
 	switch (p.previous.type) {
-		case FALSE: p.emit_instruction(FALSE);
-		case NIL:   p.emit_instruction(NIL);
-		case TRUE:  p.emit_instruction(TRUE);
+		case FALSE: p.emit_ops(FALSE);
+		case NIL:   p.emit_ops(NIL);
+		case TRUE:  p.emit_ops(TRUE);
 		default: $$unreachable();
 	}
 }
@@ -61,8 +61,8 @@ fn void Parser.unary(&p) {
 	// Note order of parsing, negation should be above operand on stack
 	p.parse_precedence(UNARY);
 	switch (op_type) {
-		case BANG: p.emit_instruction(NOT);
-		case MINUS: p.emit_instruction(NEGATE);
+		case BANG:  p.emit_ops(NOT);
+		case MINUS: p.emit_ops(NEGATE);
 		default: $$unreachable();
 	}
 }
@@ -72,10 +72,10 @@ fn void Parser.binary(&p) {
 	ParseRule* rule = p.get_rule(op_type);
 	p.parse_precedence(rule.precedence + 1);
 	switch (op_type) {
-		case PLUS:  p.emit_instruction(ADD);
-		case MINUS: p.emit_instruction(SUBTRACT);
-		case STAR:  p.emit_instruction(MULTIPLY);
-		case SLASH: p.emit_instruction(DIVIDE);
+		case PLUS:  p.emit_ops(ADD);
+		case MINUS: p.emit_ops(SUBTRACT);
+		case STAR:  p.emit_ops(MULTIPLY);
+		case SLASH: p.emit_ops(DIVIDE);
 		default: $$unreachable();
 	}
 }
@@ -208,11 +208,10 @@ fn void Parser.error_at(&p, Token* token, String msg) {
 fn Chunk* Parser.current_chunk(&p) {
 	return p.compiling_chunk;
 }
-fn void Parser.emit_byte(&p, char byte) {
-	p.current_chunk().write(byte, p.previous.line);
-}
-fn void Parser.emit_instruction(&p, OpCode opcode, char... bytes) {
-	p.current_chunk().write_instruction(opcode, p.previous.line, ...bytes);
+fn void Parser.emit_ops(&p, OpCode... ops) {
+	foreach (op: ops) {
+		p.current_chunk().write_instruction(op, p.previous.line);
+	}
 }
 fn void! Parser.emit_constant(&p, Value value) {
 	return p.current_chunk().write_constant(value, p.previous.line);
