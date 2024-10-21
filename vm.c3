@@ -45,6 +45,9 @@ fn void! Vm.interpret(&vm, Chunk* chnk) {
 				vm.stack.push(value::from_bool(true));
 			case FALSE:
 				vm.stack.push(value::from_bool(false));
+			case NOT:
+				Value constant = vm.stack.pop()!;
+				vm.stack.push(value::from_bool(constant.is_falsey()));
 			case NEGATE:
 				// check before pop, in case garbage collector triggered during op
 				if (!vm.stack[^1].is_number()) {

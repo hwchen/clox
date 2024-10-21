@@ -10,6 +10,7 @@ enum OpCode : char {
 	NIL,
 	TRUE,
 	FALSE,
+	NOT,
 	NEGATE,
 	ADD,
 	SUBTRACT,
@@ -83,6 +84,7 @@ fn int instruction_disassemble(Chunk* chunk, int offset) {
 		case NIL:
 		case TRUE:
 		case FALSE:
+		case NOT:
 		case NEGATE:
 		case ADD:
 		case SUBTRACT:

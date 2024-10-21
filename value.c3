@@ -39,6 +39,9 @@ fn bool! Value.as_bool(&v) {
 fn double! Value.as_number(&v) {
 	return (v.type == NUMBER) ? v.number : ValueError.ERR_AS_NUMBER?;
 }
+fn bool Value.is_falsey(&v) {
+	return v.is_nil() || !(v.as_bool() ?? true);
+}
 fn void Value.print(&v) {
 	switch (v.type) {
 		case BOOL: io::printf("%s", v.boolean);

@@ -61,6 +61,7 @@ fn void Parser.unary(&p) {
 	// Note order of parsing, negation should be above operand on stack
 	p.parse_precedence(UNARY);
 	switch (op_type) {
+		case BANG: p.emit_instruction(NOT);
 		case MINUS: p.emit_instruction(NEGATE);
 		default: $$unreachable();
 	}
@@ -126,7 +127,7 @@ ParseRule[] rules = {
 	[TokenType.SEMICOLON]     = {null,             null,           NONE},
 	[TokenType.SLASH]         = {null,             &Parser.binary, FACTOR},
 	[TokenType.STAR]          = {null,             &Parser.binary, FACTOR},
-	[TokenType.BANG]          = {null,             null,           NONE},
+	[TokenType.BANG]          = {&Parser.unary,    null,           NONE},
 	[TokenType.BANG_EQUAL]    = {null,             null,           NONE},
 	[TokenType.EQUAL]         = {null,             null,           NONE},
 	[TokenType.EQUAL_EQUAL]   = {null,             null,           NONE},
