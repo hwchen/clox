@@ -76,7 +76,7 @@ fn void! Vm.interpret(&vm, Chunk* chnk) {
 		}
 	}
 }
-macro void! Vm.@binary_op(&vm, #from_value, #binary_fn) {
+macro void! Vm.@binary_op(&vm, #from_value, #binary_macro) {
 	// check before pop, in case garbage collector triggered during op
 	if (!vm.stack[^1].is_number() || !vm.stack[^2].is_number()) {
 		vm.runtime_error("Operand must be a number.");
@@ -86,15 +86,16 @@ macro void! Vm.@binary_op(&vm, #from_value, #binary_fn) {
 	Value va = vm.stack.pop()!;
 	double b = vb.number;
 	double a = va.number;
-	vm.stack.push(#from_value(#binary_fn(a, b)));
+	vm.stack.push(#from_value(#binary_macro(a, b)));
 }
-// These functions are for passing into macro, as we can't pass operators directly
-fn double add(double a, double b) { return a + b; }
-fn double sub(double a, double b) { return a - b; }
-fn double mul(double a, double b) { return a * b; }
-fn double div(double a, double b) { return a / b; }
-fn bool gt(double a, double b) { return a < b; }
-fn bool lt(double a, double b) { return a < b; }
+// These macros are for passing into binary_op macro,
+// as we can't pass operators directly
+macro add(a, b) { return a + b; }
+macro sub(a, b) { return a - b; }
+macro mul(a, b) { return a * b; }
+macro div(a, b) { return a / b; }
+macro gt(a, b) { return a < b; }
+macro lt(a, b) { return a < b; }
 
 fn void Vm.runtime_error(&vm, String format, any... args) {
 	io::eprintfn(format, ...args);
