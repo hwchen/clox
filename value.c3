@@ -61,12 +61,15 @@ fn bool Value.is_falsey(&v) {
 fn bool Value.equals(a, Value b) {
 	if (a.type != b.type) return false;
 	switch (a.type) {
-		case BOOL:
-			return (a.boolean == b.boolean);
-		case NIL:
-			return true;
-		case NUMBER:
-			return (a.number == b.number);
+		case BOOL:   return a.boolean == b.boolean;
+		case NIL:    return true;
+		case NUMBER: return a.number == b.number;
+		case OBJ:
+			// Strings are the only objects checked for eq
+			ObjString* a_str = a.as_string();
+			ObjString* b_str = b.as_string();
+			return a_str.length == b_str.length &&
+				mem::equals(a_str.chars, b_str.chars, a_str.length);
 		default: $$unreachable();
 	}
 }
