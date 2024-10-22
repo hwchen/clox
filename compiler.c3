@@ -1,9 +1,9 @@
 module compiler;
 
 import std::io;
-import std::core::string;
 
 import chunk;
+import object;
 import scanner;
 import value;
 
@@ -41,6 +41,19 @@ fn void Parser.number(&p) {
 	String s = p.scanner.lexeme(p.previous);
 	double val = s.to_float() ?? 0;
 	if (catch err = p.emit_constant(value::from_number(val))) {
+		p.error(string::tformat("%s", err));
+	}
+}
+// Allocates, think about strategy in the future.
+fn void Parser.string(&p) {
+	String s= p.scanner.lexeme(p.previous);
+	ZString chars = s[1:^2].zstr_copy(); // trims quotes
+	ObjString* obj_s = mem::new(ObjString);
+	obj_s.obj.type = STRING;
+	obj_s.length = p.previous.length - 2;
+	obj_s.chars = chars;
+	Value v = value::from_obj((Obj*)obj_s);
+	if (catch err = p.emit_constant(v)) {
 		p.error(string::tformat("%s", err));
 	}
 }
@@ -142,7 +155,7 @@ ParseRule[] rules = {
 	[TokenType.LESS]          = {null,             &Parser.binary, COMPARISON},
 	[TokenType.LESS_EQUAL]    = {null,             &Parser.binary, COMPARISON},
 	[TokenType.IDENTIFIER]    = {null,             null,           NONE},
-	[TokenType.STRING]        = {null,             null,           NONE},
+	[TokenType.STRING]        = {&Parser.string,   null,           NONE},
 	[TokenType.NUMBER]        = {&Parser.number,   null,           NONE},
 	[TokenType.AND]           = {null,             null,           NONE},
 	[TokenType.CLASS]         = {null,             null,           NONE},

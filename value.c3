@@ -78,8 +78,7 @@ fn void Value.print(&v) {
 		case OBJ:
 			switch (v.obj.type) {
 				case STRING:
-					ObjString* s = (ObjString*)v.obj;
-					io::printf("%s", s.chars[:s.length]);
+					io::printf("%s", (ZString)v.as_cstring());
 			}
 	}
 }
