@@ -62,30 +62,12 @@ fn void! Vm.interpret(&vm, Chunk* chnk) {
 				Value b = vm.stack.pop()!;
 				Value a = vm.stack.pop()!;
 				vm.stack.push(value::from_bool(a.equals(b)));
-			case GREATER:
-			case LESS:
-			case ADD:
-			case SUBTRACT:
-			case MULTIPLY:
-			case DIVIDE:
-				// check before pop, in case garbage collector triggered during op
-				if (!vm.stack[^1].is_number() || !vm.stack[^2].is_number()) {
-					vm.runtime_error("Operand must be a number.");
-					return VmError.RUNTIME_ERROR?;
-				}
-				Value vb = vm.stack.pop()!;
-				Value va = vm.stack.pop()!;
-				double b = vb.number;
-				double a = va.number;
-				switch (opcode) {
-					case GREATER:  vm.stack.push(value::from_bool(a > b));
-					case LESS:     vm.stack.push(value::from_bool(a < b));
-					case ADD:      vm.stack.push(value::from_number(a + b));
-					case SUBTRACT: vm.stack.push(value::from_number(a - b));
-					case MULTIPLY: vm.stack.push(value::from_number(a * b));
-					case DIVIDE:   vm.stack.push(value::from_number(a / b));
-					default: $$unreachable();
-				}
+			case GREATER:  vm.@binary_op(value::from_bool, gt)!;
+			case LESS:     vm.@binary_op(value::from_bool, lt)!;
+			case ADD:      vm.@binary_op(value::from_number, add)!;
+			case SUBTRACT: vm.@binary_op(value::from_number, sub)!;
+			case MULTIPLY: vm.@binary_op(value::from_number, mul)!;
+			case DIVIDE:   vm.@binary_op(value::from_number, div)!;
 			case RETURN:
 				Value constant = vm.stack.pop()!;
 				constant.print();
@@ -94,6 +76,25 @@ fn void! Vm.interpret(&vm, Chunk* chnk) {
 		}
 	}
 }
+macro void! Vm.@binary_op(&vm, #from_value, #binary_fn) {
+	// check before pop, in case garbage collector triggered during op
+	if (!vm.stack[^1].is_number() || !vm.stack[^2].is_number()) {
+		vm.runtime_error("Operand must be a number.");
+		return VmError.RUNTIME_ERROR?;
+	}
+	Value vb = vm.stack.pop()!;
+	Value va = vm.stack.pop()!;
+	double b = vb.number;
+	double a = va.number;
+	vm.stack.push(#from_value(#binary_fn(a, b)));
+}
+// These functions are for passing into macro, as we can't pass operators directly
+fn double add(double a, double b) { return a + b; }
+fn double sub(double a, double b) { return a - b; }
+fn double mul(double a, double b) { return a * b; }
+fn double div(double a, double b) { return a / b; }
+fn bool gt(double a, double b) { return a < b; }
+fn bool lt(double a, double b) { return a < b; }
 
 fn void Vm.runtime_error(&vm, String format, any... args) {
 	io::eprintfn(format, ...args);
