@@ -14,9 +14,9 @@ fn bool compile(char[] src, Chunk* chunk) {
 	Parser p = {.scanner = scanner, .compiling_chunk = chunk};
 
 	p.advance();
-	p.expression();
-	p.consume(TokenType.EOF, "expect end of expression.");
-	p.emit_ops(RETURN);
+	while (!p.match(EOF)) {
+		p.declaration();
+	}
 
 	$if $feature(DEBUG_PRINT_CODE):
 		p.current_chunk().disassemble("code");
@@ -34,6 +34,19 @@ struct Parser {
 	Chunk*           compiling_chunk;
 }
 
+fn void Parser.declaration(&p) {
+	p.statement();
+}
+fn void Parser.statement(&p) {
+	if (p.match(PRINT)) {
+		p.print_statement();
+	}
+}
+fn void Parser.print_statement(&p) {
+	p.expression();
+	p.consume(SEMICOLON, "expected ';' after expression");
+	p.emit_ops(PRINT);
+}
 fn void Parser.expression(&p) {
 	p.parse_precedence(ASSIGNMENT);
 }
@@ -193,6 +206,15 @@ fn void Parser.consume(&p, TokenType token_type, String err_msg) {
 		return;
 	}
 	p.error_at_current(err_msg);
+}
+fn bool Parser.match(&p, TokenType token_type) {
+	if (!p.check(token_type)) return false;
+	p.advance();
+	return true;
+}
+fn bool Parser.check(&p, TokenType token_type) {
+	// TODO refactor? is this really needed as separate method?
+	return p.current.type == token_type;
 }
 
 // === error handling ===

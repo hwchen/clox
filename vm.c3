@@ -19,7 +19,7 @@ fn void! Vm.interpret(&vm, Chunk* chnk) {
 	vm.chunk = chnk;
 	vm.ip = 0;
 
-	while(true) {
+	while(vm.ip < vm.chunk.code.len()) {
 		$if $feature(DEBUG_TRACE_EXECUTION):
 			io::printf("     ");
 			foreach (v : vm.stack) {
@@ -68,11 +68,11 @@ fn void! Vm.interpret(&vm, Chunk* chnk) {
 			case SUBTRACT: vm.@binary_op(value::from_number, sub)!;
 			case MULTIPLY: vm.@binary_op(value::from_number, mul)!;
 			case DIVIDE:   vm.@binary_op(value::from_number, div)!;
-			case RETURN:
+			case PRINT:
 				Value constant = vm.stack.pop()!;
 				constant.print();
 				io::printn();
-				return;
+			case RETURN:
 		}
 	}
 }

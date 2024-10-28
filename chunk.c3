@@ -19,6 +19,7 @@ enum OpCode : char {
 	SUBTRACT,
 	MULTIPLY,
 	DIVIDE,
+	PRINT,
 	RETURN,
 }
 
@@ -96,6 +97,7 @@ fn int instruction_disassemble(Chunk* chunk, int offset) {
 		case SUBTRACT:
 		case MULTIPLY:
 		case DIVIDE:
+		case PRINT:
 		case RETURN:
 			io::printfn("%s", opcode);
 			return offset + 1;
