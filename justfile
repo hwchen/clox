@@ -1,3 +1,6 @@
+check *args="":
+    c3c compile . -C {{args}}
+
 build *args="":
     c3c compile . {{args}}
 
