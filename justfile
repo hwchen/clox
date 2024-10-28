@@ -1,7 +1,7 @@
-check *args="":
+@check *args="":
     c3c compile . -C {{args}}
 
-build *args="":
+@build *args="":
     c3c compile . {{args}}
 
 # `-D DEBUG_TRACE_EXECUTION` prints execution in vm
