@@ -73,6 +73,8 @@ fn void! Vm.interpret(&vm, Chunk* chnk) {
 				constant.print();
 				io::printn();
 			case RETURN:
+			case POP:
+				vm.stack.pop()!;
 		}
 	}
 }

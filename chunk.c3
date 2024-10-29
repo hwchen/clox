@@ -21,6 +21,7 @@ enum OpCode : char {
 	DIVIDE,
 	PRINT,
 	RETURN,
+	POP,
 }
 
 struct Chunk {
@@ -99,6 +100,7 @@ fn int instruction_disassemble(Chunk* chunk, int offset) {
 		case DIVIDE:
 		case PRINT:
 		case RETURN:
+		case POP:
 			io::printfn("%s", opcode);
 			return offset + 1;
 	}

@@ -40,12 +40,19 @@ fn void Parser.declaration(&p) {
 fn void Parser.statement(&p) {
 	if (p.match(PRINT)) {
 		p.print_statement();
+	} else {
+		p.expression_statement();
 	}
 }
 fn void Parser.print_statement(&p) {
 	p.expression();
 	p.consume(SEMICOLON, "expected ';' after expression");
 	p.emit_ops(PRINT);
+}
+fn void Parser.expression_statement(&p) {
+	p.expression();
+	p.consume(SEMICOLON, "expected ';' after expression");
+	p.emit_ops(POP);
 }
 fn void Parser.expression(&p) {
 	p.parse_precedence(ASSIGNMENT);
