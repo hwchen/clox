@@ -36,6 +36,7 @@ struct Parser {
 
 fn void Parser.declaration(&p) {
 	p.statement();
+	if (p.panic_mode) p.synchronize();
 }
 fn void Parser.statement(&p) {
 	if (p.match(PRINT)) {
@@ -249,6 +250,25 @@ fn void Parser.error_at(&p, Token* token, String msg) {
 	}
 	io::eprintfn(": %s", msg);
 	p.had_error = true;
+}
+fn void Parser.synchronize(&p) {
+	// synchronize at semicolon (end of statement)
+	p.panic_mode = false;
+	while (p.current.type != EOF) {
+		if (p.previous.type == SEMICOLON) return;
+		switch (p.current.type) {
+			case CLASS:
+			case FUN:
+			case VAR:
+			case FOR:
+			case IF:
+			case WHILE:
+			case PRINT:
+			case RETURN: return;
+			default: // nothing
+		}
+		p.advance();
+	}
 }
 
 // === emit to chunk ===
